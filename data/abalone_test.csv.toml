@@ -1,0 +1,28 @@
+[[attribute]]
+type = "Nominal"
+values = ["M","F","I"]
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+
+[[attribute]]
+type = "Numeric"
+

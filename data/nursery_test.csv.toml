@@ -1,0 +1,36 @@
+[[attribute]]
+type = "Nominal"
+values = ["usual","pretentious","great_pret"]
+
+[[attribute]]
+type = "Nominal"
+values = ["proper","less_proper","improper","critical","very_crit"]
+
+[[attribute]]
+type = "Nominal"
+values = ["complete","completed","incomplete","foster"]
+
+[[attribute]]
+type = "Ordinal"
+values = ["1","2","3","more"]
+
+[[attribute]]
+type = "Nominal"
+values = ["convenient","less_conv","critical"]
+
+[[attribute]]
+type = "Nominal"
+values = ["convenient","inconv"]
+
+[[attribute]]
+type = "Nominal"
+values = ["nonprob","slightly_prob","problematic"]
+
+[[attribute]]
+type = "Nominal"
+values = ["recommended","priority","not_recom"]
+
+[[attribute]]
+type = "Nominal"
+values = ["recommend","priority","not_recom","very_recom","spec_prior"]
+
