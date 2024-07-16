@@ -52,7 +52,7 @@ def make_missing(data, rate = 0.1, type = "mcar"):
     return data
 
 
-def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
+def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None,dataname = None):
     X = data["X"]
     Y = data["Y"]
     train_X, test_X, train_Y, test_Y = train_test_split(X, Y, test_size=0.2, random_state=42)
@@ -95,7 +95,7 @@ def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
         X_kpca_train = imputer.fit_transform(train_X)
         X_kpca_test = imputer.transform(test_X)
 
-    elif model == "genRBF":
+    elif model == "genrbf":
         C = 1
         gamma = 1.e-3
         index_train = np.arange(train_X.shape[0])
@@ -110,8 +110,12 @@ def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
         train_X_imputed = imputer.fit_transform(train_X)
 
         # Step 2: Compute column mean and covariance matrix
-        m = np.mean(train_X_imputed, axis=0)
-        cov = np.cov(train_X_imputed, rowvar=False)
+        if dataname == "genrbf":
+            m = np.loadtxt("data/rbf/mu.txt", delimiter= ' ')  # Change delimiter if needed
+            cov = np.loadtxt("data/rbf/cov.txt", delimiter=' ')  # Change delimiter if needed
+        else:
+            m = np.mean(train_X_imputed, axis=0)
+            cov = np.cov(train_X_imputed, rowvar=False)
 
         rbf_ker = rbf.RBFkernel(m, cov, train_X)
 
@@ -142,6 +146,7 @@ def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
 
         print(f"Mean CV F1 Score {model}: {np.mean(f1):.4f}")
         print(f"Mean CV Accuracy {model}: {np.mean(acc):.4f}")
+        
         return f1,acc
 
 
