@@ -14,6 +14,7 @@ from ctypes import c_float
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
 from sklearn.model_selection import StratifiedKFold, cross_val_score
+from rbfn_model import rbfn
 
 def make_missing(data, rate = 0.1, type = "mcar"):
     if not rate:
@@ -52,7 +53,7 @@ def make_missing(data, rate = 0.1, type = "mcar"):
     return data
 
 
-def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None,dataname = None):
+def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
     X = data["X"]
     Y = data["Y"]
     train_X, test_X, train_Y, test_Y = train_test_split(X, Y, test_size=0.2, random_state=42)
@@ -94,6 +95,14 @@ def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None,d
         # Fit the imputer on the training data and transform both training and test data
         X_kpca_train = imputer.fit_transform(train_X)
         X_kpca_test = imputer.transform(test_X)
+    elif model == "rbfn":
+
+        y_pred = rbfn(train_X,test_X,train_Y,test_Y)
+
+        # acc = accuracy_score(test_Y, y_pred)
+        # f1 = f1_score(test_Y, y_pred, average='macro')
+
+        exit()
 
     elif model == "genrbf":
         C = 1
@@ -109,13 +118,9 @@ def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None,d
         imputer = SimpleImputer(strategy='mean')
         train_X_imputed = imputer.fit_transform(train_X)
 
-        # Step 2: Compute column mean and covariance matrix
-        if dataname == "genrbf":
-            m = np.loadtxt("data/rbf/mu.txt", delimiter= ' ')  # Change delimiter if needed
-            cov = np.loadtxt("data/rbf/cov.txt", delimiter=' ')  # Change delimiter if needed
-        else:
-            m = np.mean(train_X_imputed, axis=0)
-            cov = np.cov(train_X_imputed, rowvar=False)
+
+        m = np.mean(train_X_imputed, axis=0)
+        cov = np.cov(train_X_imputed, rowvar=False)
 
         rbf_ker = rbf.RBFkernel(m, cov, train_X)
 

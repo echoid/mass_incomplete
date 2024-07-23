@@ -37,12 +37,24 @@ dataset_dict = {
     "concrete": {"X": np.load("data/concrete_compression/feature.npy"), "Y": np.load("data/concrete_compression/label.npy")},
     "wine": {"X": np.load("data/wine_quality_white/feature.npy"), "Y": np.load("data/wine_quality_white/label.npy")},
     "yacht": {"X": np.load("data/yacht_hydrodynamics/feature.npy"), "Y": np.load("data/yacht_hydrodynamics/label.npy")},
-    #"yeast": {"X": np.load("data/yeast/feature.npy"), "Y": np.load("data/yeast/label.npy")},
-    #"qsar": {"X": np.load("data/qsar_biodegradation/feature.npy"), "Y": np.load("data/qsar_biodegradation/label.npy")},
     "sonar": {"X": np.load("data/connectionist_bench_sonar/feature.npy"), "Y": np.load("data/connectionist_bench_sonar/label.npy")},
     "ionosphere": {"X": np.load("data/ionosphere/feature.npy"), "Y": np.load("data/ionosphere/label.npy")},
-    
-    }
+    "pima": {"X": np.load("data/pima/feature.npy"), "Y": np.load("data/pima/label.npy")},
+    "winconsin": {"X": np.load("data/winconsin/feature.npy"), "Y": np.load("data/winconsin/label.npy")},
+    "bands": {"X": np.load("data/bands/feature.npy"), "Y": np.load("data/bands/label.npy")},
+    "kidney_disease": {"X": np.load("data/kidney_disease/feature.npy"), "Y": np.load("data/kidney_disease/label.npy")},
+    "horse": {"X": np.load("data/horse/feature.npy"), "Y": np.load("data/horse/label.npy")},
+    "mammographics": {"X": np.load("data/mammographics/feature.npy"), "Y": np.load("data/mammographics/label.npy")},
+    "hepatitis": {"X": np.load("data/hepatitis/feature.npy"), "Y": np.load("data/hepatitis/label.npy")},
+}
+
+single_rate = ["genrbf",'pima',
+ 'winconsin',
+ 'bands',
+ 'kidney_disease',
+ 'horse',
+ 'mammographics',
+ 'hepatitis']
 
 def save_results_to_csv(dataname, typename, model, results):
     # Construct the directory path
@@ -62,10 +74,26 @@ def save_results_to_csv(dataname, typename, model, results):
     
     print(f"Results saved to {filename}")
 
+def calculate_missing_rate(arr):
+
+    total_elements = arr.size
+    
+    # Number of missing elements (np.nan)
+    missing_elements = np.isnan(arr).sum()
+    
+    # Calculate missing value rate
+    missing_rate = missing_elements / total_elements
+    
+    return missing_rate
+
 def main():
     parser = argparse.ArgumentParser(description="Run tests on datasets with specified models")
-    parser.add_argument('--datasets', nargs='+', default=["syn_1", "syn_2", "syn_3", "banknote", "genrbf", "climate", "yeast", "qsar", "sonar","ionosphere"], help='List of datasets to run tests on')
-    parser.add_argument('--models', nargs='+', default=['mass', 'mean', 'genrbf', 'mice'], help='List of models to run tests with')
+    parser.add_argument('--datasets', nargs='+', default=[
+        "syn_1", "syn_2", "syn_3", "banknote", "genrbf", "climate", 
+        "yeast", "qsar", "sonar", "ionosphere", "pima", "winconsin", 
+        "bands", "kidney_disease", "horse", "mammographics", "hepatitis"], 
+        help='List of datasets to run tests on')
+    parser.add_argument('--models', nargs='+', default=['mass', 'mean', 'genrbf', 'mice',"rbfn"], help='List of models to run tests with')
     args = parser.parse_args()
     
     datasets = [dataset_dict[dataname] for dataname in args.datasets]
@@ -78,8 +106,8 @@ def main():
     models = args.models
 
     for data, dataname in zip(datasets, datanames):
-        if dataname == "genrbf":
-            missrates = mymissrates
+        if dataname in single_rate:
+            missrates = [calculate_missing_rate(data["X"])]
             typenames = mytypenames
         else:
             missrates = orimissrates
@@ -89,7 +117,7 @@ def main():
                 results = []
                 for missrate in missrates:
                     print(dataname, typename, model)
-                    f1, acc = run_test(data, missrate, typename, model,dataname)
+                    f1, acc = run_test(data, missrate, typename, model)
                     results.append((missrate, f1, acc))
                 save_results_to_csv(dataname, typename, model, results)
 
