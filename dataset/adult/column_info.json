@@ -1,0 +1,142 @@
+{
+    "0": "numerical",
+    "1": {
+        "nominal": {
+            "Private": 1,
+            "Self-emp-not-inc": 2,
+            "Local-gov": 3,
+            "State-gov": 4,
+            "?": 5,
+            "Self-emp-inc": 6,
+            "Federal-gov": 7,
+            "Without-pay": 8,
+            "Never-worked": 9
+        }
+    },
+    "2": "numerical",
+    "3": {
+        "ordinal": {
+            "Preschool": 1,
+            "1st-4th": 2,
+            "5th-6th": 3,
+            "7th-8th": 4,
+            "9th": 5,
+            "10th": 6,
+            "11th": 7,
+            "12th": 8,
+            "HS-grad": 9,
+            "Some-college": 10,
+            "Assoc-voc": 11,
+            "Assoc-acdm": 12,
+            "Bachelors": 13,
+            "Masters": 14,
+            "Prof-school": 15,
+            "Doctorate": 16
+        }
+    },
+    "4": "numerical",
+    "5": {
+        "nominal": {
+            "Married-civ-spouse": 1,
+            "Never-married": 2,
+            "Divorced": 3,
+            "Separated": 4,
+            "Widowed": 5,
+            "Married-spouse-absent": 6,
+            "Married-AF-spouse": 7
+        }
+    },
+    "6": {
+        "nominal": {
+            "Prof-specialty": 1,
+            "Craft-repair": 2,
+            "Exec-managerial": 3,
+            "Adm-clerical": 4,
+            "Sales": 5,
+            "Other-service": 6,
+            "Machine-op-inspct": 7,
+            "Transport-moving": 8,
+            "Handlers-cleaners": 9,
+            "?": 10,
+            "Farming-fishing": 11,
+            "Tech-support": 12,
+            "Protective-serv": 13,
+            "Priv-house-serv": 14,
+            "Armed-Forces": 15
+        }
+    },
+    "7": {
+        "nominal": {
+            "Husband": 1,
+            "Not-in-family": 2,
+            "Own-child": 3,
+            "Unmarried": 4,
+            "Wife": 5,
+            "Other-relative": 6
+        }
+    },
+    "8": {
+        "nominal": {
+            "White": 1,
+            "Black": 2,
+            "Asian-Pac-Islander": 3,
+            "Amer-Indian-Eskimo": 4,
+            "Other": 5
+        }
+    },
+    "9": {
+        "nominal": {
+            "Female": 0,
+            "Male": 1
+        }
+    },
+    "10": "numerical",
+    "11": "numerical",
+    "12": "numerical",
+    "13": {
+        "nominal": {
+            "United-States": 1,
+            "Mexico": 2,
+            "?": 3,
+            "Philippines": 4,
+            "Germany": 5,
+            "Puerto-Rico": 6,
+            "Canada": 7,
+            "El-Salvador": 8,
+            "India": 9,
+            "Cuba": 10,
+            "England": 11,
+            "China": 12,
+            "South": 13,
+            "Jamaica": 14,
+            "Italy": 15,
+            "Dominican-Republic": 16,
+            "Japan": 17,
+            "Guatemala": 18,
+            "Poland": 19,
+            "Vietnam": 20,
+            "Columbia": 21,
+            "Haiti": 22,
+            "Portugal": 23,
+            "Taiwan": 24,
+            "Iran": 25,
+            "Nicaragua": 26,
+            "Greece": 27,
+            "Peru": 28,
+            "Ecuador": 29,
+            "France": 30,
+            "Ireland": 31,
+            "Hong": 32,
+            "Thailand": 33,
+            "Cambodia": 34,
+            "Trinadad&Tobago": 35,
+            "Outlying-US(Guam-USVI-etc)": 36,
+            "Laos": 37,
+            "Yugoslavia": 38,
+            "Scotland": 39,
+            "Honduras": 40,
+            "Hungary": 41,
+            "Holand-Netherlands": 42
+        }
+    }
+}
