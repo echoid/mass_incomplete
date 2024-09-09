@@ -36,7 +36,7 @@ datasets=("car" "breast" "australian" "heart"
           "student" "banknote" "sonar" "spam" "wine")
 
 # List of models
-models=("mice" "mean")
+models=("mice" "mean" "genrbf")
 
 # List of missing types
 missing_types=("mcar" "mar" "mnar")
@@ -45,7 +45,7 @@ missing_types=("mcar" "mar" "mnar")
 for dataset in "${datasets[@]}"; do
   for model in "${models[@]}"; do
     for missing_type in "${missing_types[@]}"; do
-      python main.py --datasets $dataset --models $model --missing_types $missing_type 
+      python main.py --datasets $dataset --models $model --missing_types $missing_type --save
     done
   done
 done

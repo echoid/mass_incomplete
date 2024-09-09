@@ -10,19 +10,16 @@ from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from genrbf.run_genrbf import run_genrbf
+from rbfn_model import run_rbfn
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
 # from mass import Modify_Kernel as MKernel
 # import numpy as np
-# from genRBF_source import RBFkernel as rbf
-# from genRBF_source import cRBFkernel as fun
-# from ctypes import c_float
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
-# from sklearn.model_selection import StratifiedKFold, cross_val_score
 # from rbfn_model import rbfn
 
 
+
+from sklearn.model_selection import StratifiedKFold
 
 def run(dataset, missing_type, model, missing_rates, y):
     
@@ -36,64 +33,78 @@ def run(dataset, missing_type, model, missing_rates, y):
     for rate in missing_rates:
         data_na = np.load(na_path + f"{rate}.npy")
         
-        # Run the model and get the evaluation results
-        results = run_model(model, data_na, y)
+        skf = StratifiedKFold(n_splits=5)
+        results_list = []
 
-        # Store the results with the missing rate as the key
-        all_results[rate] = results
+        for id_acc, (trn_index, test_index) in enumerate(skf.split(data_na, y)):
+            
+            X_train, X_test = data_na[trn_index], data_na[test_index]
+            y_train, y_test = y[trn_index], y[test_index]
+            
+            # Run the model and get the evaluation results
+            results = run_model(model, X_train, X_test, y_train, y_test)
+            results_list.append(results)
+        
+        # Aggregate results for this missing rate
+        all_results[rate] = aggregate_results(results_list)
 
     return all_results
 
-def run_model(model, data_na, y):
+def run_model(model, X_train, X_test, y_train, y_test):
     if model == "mean":
         imputer = SimpleImputer(strategy='mean')
-        data_na = imputer.fit_transform(data_na)
-        results = SVC_evaluation(data_na, y)
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        results = SVC_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "mice":
         imputer = IterativeImputer()
-        data_na = imputer.fit_transform(data_na)
-        results = SVC_evaluation(data_na, y)
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        results = SVC_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "genrbf":
-        representation = run_genrbf(data_na)
-        results = SVC_evaluation(representation, y,kernel="precomputed")
-        
+        train,test = run_genrbf(X_train, X_test)
+        results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
+    elif model == "rbfn":
+        results = run_rbfn(X_train, X_test, y_train, y_test)
 
     return results
 
-def SVC_evaluation(X, y, kernel="rbf"):
+def SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf"):
     C = 1
 
     # Define the SVC model
-    precomputed_svm = SVC(C=C, kernel=kernel)
+    svc = SVC(C=C, kernel=kernel)
 
-    # Define the cross-validation strategy
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    # Train the model on the training data
+    svc.fit(X_train, y_train)
 
-    # Accuracy and F1 scorers
-    accuracy_scorer = make_scorer(accuracy_score)
-    f1_scorer = make_scorer(f1_score, average='macro')
+    # Evaluate on the test data
+    y_pred = svc.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='macro')
 
-    # Cross-validation for accuracy
-    accuracies = cross_val_score(precomputed_svm, X, y, cv=kf, scoring=accuracy_scorer)
-    avg_accuracy = accuracies.mean()
-    std_accuracy = accuracies.std()
-
-    # Cross-validation for F1 score
-    f1_scores = cross_val_score(precomputed_svm, X, y, cv=kf, scoring=f1_scorer)
-    avg_f1_score = f1_scores.mean()
-    std_f1_score = f1_scores.std()
-
-    # Save the results in a dictionary
     results = {
+        "accuracy": accuracy,
+        "f1_score": f1,
+    }
+
+    return results
+
+def aggregate_results(results_list):
+    avg_accuracy = np.mean([result['accuracy'] for result in results_list])
+    avg_f1_score = np.mean([result['f1_score'] for result in results_list])
+    std_accuracy = np.std([result['accuracy'] for result in results_list])
+    std_f1_score = np.std([result['f1_score'] for result in results_list])
+
+    return {
         "avg_accuracy": avg_accuracy,
         "std_accuracy": std_accuracy,
         "avg_f1_score": avg_f1_score,
         "std_f1_score": std_f1_score
     }
 
-    return results
 
 def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
     X = data["X"]
