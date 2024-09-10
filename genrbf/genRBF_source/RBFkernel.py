@@ -34,6 +34,8 @@ class RBFkernel(object):
         self._info(np.zeros(self.n_features))
 
         G = np.linalg.inv(covariance_matrix)
+
+        
         reference = False
         if len(self.JJ) < self.n_features:
             self.G = G[np.ix_(self.JJ, self.JJ)]

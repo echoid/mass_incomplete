@@ -11,6 +11,7 @@ from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from genrbf.run_genrbf import run_genrbf
 from rbfn_model import run_rbfn
+from tqdm import tqdm
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
 # from mass import Modify_Kernel as MKernel
@@ -30,7 +31,7 @@ def run(dataset, missing_type, model, missing_rates, y):
 
     all_results = {}
 
-    for rate in missing_rates:
+    for rate in tqdm(missing_rates):
         data_na = np.load(na_path + f"{rate}.npy")
         
         skf = StratifiedKFold(n_splits=5)
@@ -64,7 +65,7 @@ def run_model(model, X_train, X_test, y_train, y_test):
         results = SVC_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "genrbf":
-        train,test = run_genrbf(X_train, X_test)
+        train,test = run_genrbf(X_train.astype(np.float64), X_test.astype(np.float64))
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
     elif model == "rbfn":
         results = run_rbfn(X_train, X_test, y_train, y_test)
@@ -72,6 +73,13 @@ def run_model(model, X_train, X_test, y_train, y_test):
     return results
 
 def SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf"):
+
+    # Check for NaN values in the input data
+    if np.isnan(X_train).any() or np.isnan(X_test).any() or np.isnan(y_train).any() or np.isnan(y_test).any():
+        return {
+            "accuracy": np.nan,
+            "f1_score": np.nan,
+        }
     C = 1
 
     # Define the SVC model

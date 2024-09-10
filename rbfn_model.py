@@ -108,7 +108,7 @@ def neural_net(data, weights, means_, covs, s, x_, w_, gamma, n_d, n_h):
 #path_dir = FLAGS.data_dir
 learning_rate = 0.001
 batch_size = 32
-training_epochs = 500
+training_epochs = 100
 
 # Network Parameters
 n_hidden_1 = 10
@@ -122,7 +122,7 @@ def run_rbfn(train_x,test_x,train_y,test_y):
 
     n_features = train_x.shape[1]
 
-    data, minx, maxx = scaler_range(data, feature_range=(-1, 1))
+    train_x, minx, maxx = scaler_range(train_x, feature_range=(-1, 1))
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
 

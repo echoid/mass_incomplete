@@ -24,8 +24,15 @@ def run_genrbf(train, test):
     index_test = index_test.astype(np.intc)
 
 
-    # Train
-    rbf_ker = rbf.RBFkernel(m, cov, X)
+
+    try:
+    # Try to create the RBF kernel object
+        rbf_ker = rbf.RBFkernel(m, cov, X)
+
+        
+    except np.linalg.LinAlgError:
+        return np.nan, np.nan
+
     S_train, S_test, completeDataId_train, completeDataId_test = fun.trainTestID_1(index_train, index_train,
                                                                                    rbf_ker.S)
     S_train_new, completeDataId_train_new = fun.updateSamples(index_train, S_train, completeDataId_train)

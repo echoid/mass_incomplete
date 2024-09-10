@@ -37,6 +37,7 @@ datasets=("car" "breast" "australian" "heart"
 
 # List of models
 models=("mice" "mean" "genrbf")
+models=("rbfn")
 
 # List of missing types
 missing_types=("mcar" "mar" "mnar")
