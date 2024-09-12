@@ -1,7 +1,7 @@
 @echo off
 
 REM Define the datasets
-set datasets=("car" "breast" "australian" "heart" "student" "banknote" "sonar" "spam" "wine")
+set datasets=("wine" "spam" "sonar" "banknote")
 
 REM Define the models
 set models=("mice" "mean" "genrbf")
