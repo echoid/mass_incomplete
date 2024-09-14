@@ -1,23 +1,91 @@
 @echo off
 
-REM Define the datasets
-set datasets=("wine" "spam" "sonar" "banknote")
+REM Check if CSV exists for mnar/car/rbfn.csv
+if not exist "results\mnar\car\rbfn.csv" (
+    echo Running experiment for dataset=car, model=rbfn, missing_type=mnar
+    python main.py --datasets car --models rbfn --missing_types mnar --save
+)
 
-REM Define the models
-set models=("mice" "mean" "genrbf")
-set models=("rbfn")
+REM Check if CSV exists for mar/breast/rbfn.csv
+if not exist "results\mar\breast\rbfn.csv" (
+    echo Running experiment for dataset=breast, model=rbfn, missing_type=mar
+    python main.py --datasets breast --models rbfn --missing_types mar --save
+)
 
-REM Define the missing types
-set missing_types=("mcar" "mar" "mnar")
+REM Check if CSV exists for mnar/breast/rbfn.csv
+if not exist "results\mnar\breast\rbfn.csv" (
+    echo Running experiment for dataset=breast, model=rbfn, missing_type=mnar
+    python main.py --datasets breast --models rbfn --missing_types mnar --save
+)
 
-REM Loop through datasets
-for %%d in %datasets% do (
-    REM Loop through models
-    for %%m in %models% do (
-        REM Loop through missing types
-        for %%t in %missing_types% do (
-            REM Run the Python script with the current parameters
-            python main.py --datasets %%~d --models %%~m --missing_types %%~t --save
-        )
-    )
+REM Check if CSV exists for mnar/australian/rbfn.csv
+if not exist "results\mnar\australian\rbfn.csv" (
+    echo Running experiment for dataset=australian, model=rbfn, missing_type=mnar
+    python main.py --datasets australian --models rbfn --missing_types mnar --save
+)
+
+REM Check if CSV exists for mnar/heart/rbfn.csv
+if not exist "results\mnar\heart\rbfn.csv" (
+    echo Running experiment for dataset=heart, model=rbfn, missing_type=mnar
+    python main.py --datasets heart --models rbfn --missing_types mnar --save
+)
+
+REM Check if CSV exists for mcar/student/rbfn.csv
+if not exist "results\mcar\student\rbfn.csv" (
+    echo Running experiment for dataset=student, model=rbfn, missing_type=mcar
+    python main.py --datasets student --models rbfn --missing_types mcar --save
+)
+
+REM Check if CSV exists for mar/student/rbfn.csv
+if not exist "results\mar\student\rbfn.csv" (
+    echo Running experiment for dataset=student, model=rbfn, missing_type=mar
+    python main.py --datasets student --models rbfn --missing_types mar --save
+)
+
+REM Check if CSV exists for mnar/student/rbfn.csv
+if not exist "results\mnar\student\rbfn.csv" (
+    echo Running experiment for dataset=student, model=rbfn, missing_type=mnar
+    python main.py --datasets student --models rbfn --missing_types mnar --save
+)
+
+REM Check if CSV exists for mcar/banknote/rbfn.csv
+if not exist "results\mcar\banknote\rbfn.csv" (
+    echo Running experiment for dataset=banknote, model=rbfn, missing_type=mcar
+    python main.py --datasets banknote --models rbfn --missing_types mcar --save
+)
+
+REM Check if CSV exists for mar/banknote/rbfn.csv
+if not exist "results\mar\banknote\rbfn.csv" (
+    echo Running experiment for dataset=banknote, model=rbfn, missing_type=mar
+    python main.py --datasets banknote --models rbfn --missing_types mar --save
+)
+
+REM Check if CSV exists for mnar/banknote/rbfn.csv
+if not exist "results\mnar\banknote\rbfn.csv" (
+    echo Running experiment for dataset=banknote, model=rbfn, missing_type=mnar
+    python main.py --datasets banknote --models rbfn --missing_types mnar --save
+)
+
+REM Check if CSV exists for mcar/sonar/rbfn.csv
+if not exist "results\mcar\sonar\rbfn.csv" (
+    echo Running experiment for dataset=sonar, model=rbfn, missing_type=mcar
+    python main.py --datasets sonar --models rbfn --missing_types mcar --save
+)
+
+REM Check if CSV exists for mar/sonar/rbfn.csv
+if not exist "results\mar\sonar\rbfn.csv" (
+    echo Running experiment for dataset=sonar, model=rbfn, missing_type=mar
+    python main.py --datasets sonar --models rbfn --missing_types mar --save
+)
+
+REM Check if CSV exists for mnar/sonar/rbfn.csv
+if not exist "results\mnar\sonar\rbfn.csv" (
+    echo Running experiment for dataset=sonar, model=rbfn, missing_type=mnar
+    python main.py --datasets sonar --models rbfn --missing_types mnar --save
+)
+
+REM Check if CSV exists for mar/spam/rbfn.csv
+if not exist "results\mar\spam\rbfn.csv" (
+    echo Running experiment for dataset=spam, model=rbfn, missing_type=mar
+    python main.py --datasets spam --models rbfn --missing_types mar --save
 )
