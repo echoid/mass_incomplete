@@ -12,6 +12,9 @@ from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from genrbf.run_genrbf import run_genrbf
 from rbfn_model import run_rbfn
 from tqdm import tqdm
+from ppca import PPCA
+from ik import IKSimilarity,IKFeature,Isolation_Kernal
+from sklearn.decomposition import PCA, KernelPCA
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
 # from mass import Modify_Kernel as MKernel
@@ -70,7 +73,56 @@ def run_model(model, X_train, X_test, y_train, y_test):
     elif model == "rbfn":
         results = run_rbfn(X_train, X_test, y_train, y_test)
 
+    elif model == "PPCA":
+        # PPCA + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train,test = run_ppca(X_train,X_test)
+        results = SVC_evaluation(train, y_train, test, y_test)
+
+    elif model == "KPCA":
+        #KPCA + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train,test = run_ppca(X_train,X_test)
+        results = SVC_evaluation(train, y_train, test, y_test)
+
+    elif model == "IK":
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        IK = Isolation_Kernal(psi=128, t=200, KD_tree=True)
+        IK.build(X_train)
+        train_feature = IK.generate_feature(X_train)
+        test_feature = IK.generate_feature(X_test)
+        test_sim = IK.similarity(test_feature,train_feature)
+        train_sim = IK.similarity(train_feature,train_feature)
+        results = SVC_evaluation(train_sim, y_train, test_sim, y_test, kernel="precomputed")
+
+
+    elif model == "mass":
+        result = run_mass(X_train, X_test, y_train, y_test)
+
     return results
+
+def run_ppca(X_train,X_test):
+    ppca = PPCA()
+    ppca.fit(data=X_train, d=100)
+    component_mat_train = ppca.transform(X_train)
+    component_mat_test = ppca.transform(X_test)
+
+    return component_mat_train,component_mat_test
+
+def run_kpca(X_train,X_test):
+    kernel_pca = KernelPCA(kernel="rbf")
+
+    component_mat_train =  kernel_pca.fit_transform(X_train)
+    component_mat_test =  kernel_pca.transform(X_test)
+
+    return component_mat_train,component_mat_test
+
 
 def SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf"):
 
