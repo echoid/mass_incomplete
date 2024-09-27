@@ -17,7 +17,7 @@ def main():
                         help='List of datasets to run tests on')
 
     # Add argument for models with a set of options and a default
-    parser.add_argument('--models', nargs='+', choices=['mass', 'mean', 'genrbf', 'mice', 'rbfn'],
+    parser.add_argument('--models', nargs='+', choices=['mass', 'mean', 'genrbf', 'mice', 'rbfn',"ik","kpca","ppca"],
                         default=['mean'],  # Set "mean" as the default model
                         help='List of models to run tests with')
 

@@ -9,7 +9,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import accuracy_score, f1_score
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 RANDOM_SEED = 42
 tf.set_random_seed(RANDOM_SEED)
 
@@ -27,6 +26,10 @@ def scaler_range(X, feature_range=(-1, 1), min_x=None, max_x=None):
     X_scaled = X_std * (feature_range[1] - feature_range[0]) + feature_range[0]
     return X_scaled, min_x, max_x
 # Create model
+
+
+
+
 def neural_net(data, weights, means_, covs, s, x_, w_, gamma, n_d, n_h):
     gamma_ = tf.abs(gamma)
     s_ = tf.abs(s)
@@ -40,9 +43,9 @@ def neural_net(data, weights, means_, covs, s, x_, w_, gamma, n_d, n_h):
     Q = []
     layer_1 = [[] for _ in range(n_d)]
     for n_comp in range(n_d):
+
         new_data = tf.where(where_isnan, tf.reshape(tf.tile(means_[n_comp, :], [size[0]]), [-1, size[1]]), data)
         new_cov = tf.where(where_isnan, tf.reshape(tf.tile(covs_[n_comp, :], [size[0]]), [-1, size[1]]), tf.zeros([size[0], size[1]]))
-
         norm = tf.subtract(new_data, means_[n_comp, :])
         norm = tf.square(norm)
         q = tf.where(where_isfinite,
@@ -159,8 +162,17 @@ def run_rbfn(train_x,test_x,train_y,test_y):
     w = init_weights((n_hidden_1, 1))
     gamma = tf.Variable(initial_value=tf.random.normal(shape=(1,), mean=1., stddev=1.), dtype=tf.float32)
 
+    try:
     # Construct the model
-    predict = neural_net(z, weights, means, covs, s, x, w, gamma, n_distribution, n_hidden_1)
+        predict = neural_net(z, weights, means, covs, s, x, w, gamma, n_distribution, n_hidden_1)
+    except:
+        results = {
+            "accuracy": np.nan,
+            "f1_score": np.nan,
+        }
+
+        return results
+
 
     # Mean squared error
     cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=predict, labels=y))
