@@ -17,7 +17,10 @@ def main():
                         help='List of datasets to run tests on')
 
     # Add argument for models with a set of options and a default
-    parser.add_argument('--models', nargs='+', choices=['mass', 'mean', 'genrbf', 'mice', 'rbfn',"ik","kpca","ppca"],
+    parser.add_argument('--models', nargs='+', choices=['mass', 'mean','mice', 
+                                                        'genrbf','rbfn',
+                                                        "ik","kpca","ppca",
+                                                        "mpk","impk"],
                         default=['mean'],  # Set "mean" as the default model
                         help='List of models to run tests with')
 
@@ -29,7 +32,7 @@ def main():
     # Add argument for missing rates with a set of options and a default
     parser.add_argument('--missing_rates', nargs='+', type=float, 
                         choices=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],  # Example missing rates
-                        default=None,  # Set 0.2 as the default missing rate
+                        default=None,  
                         help='List of missing data rates to consider')
     
     # Add a boolean flag for saving the results

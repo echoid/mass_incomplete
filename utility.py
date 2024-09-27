@@ -2,6 +2,7 @@ param_value = None
 data_stats = None
 import os
 import numpy as np
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 from sklearn.experimental import enable_iterative_imputer
@@ -9,12 +10,11 @@ from sklearn.impute import IterativeImputer
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
-from genrbf.run_genrbf import run_genrbf
-from rbfn_model import run_rbfn
+# from genrbf.run_genrbf import run_genrbf
+# from rbfn_model import run_rbfn
 from tqdm import tqdm
-from ppca import PPCA
-from ik import Isolation_Kernal,run_ppca,run_kpca
-from sklearn.decomposition import PCA, KernelPCA
+#from ik import Isolation_Kernal,run_ppca,run_kpca
+from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
 # from mass import Modify_Kernel as MKernel
@@ -25,12 +25,34 @@ from sklearn.decomposition import PCA, KernelPCA
 
 from sklearn.model_selection import StratifiedKFold
 
+def stats_convert(column_info):
+    if all(column == "numerical" for column in column_info.values()):
+        return None
+    stats = {"attribute": []}
+    for column_name, column in column_info.items():
+        col_dic = {'type': ''}
+        if column == "numerical":
+            col_dic['type'] = "Numeric"
+        elif isinstance(column, dict):
+            key = next(iter(column))
+            if key in {"ordinal", "nominal"}:
+                col_dic['type'] = key.capitalize()
+                col_dic['values'] = list(column[key].values())
+        stats["attribute"].append(col_dic)
+
+    return stats
+
 def run(dataset, missing_type, model, missing_rates, y):
     
     na_path = f"dataset_nan/{dataset}/{missing_type}/"
 
     if missing_rates is None: 
         missing_rates = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+
+    if model in ["mpk","impk"]:
+        with open(f"dataset/{dataset}/column_info.json", 'r') as file:
+            column_info = json.load(file)
+            data_stats = stats_convert(column_info)
 
     all_results = {}
 
@@ -46,7 +68,7 @@ def run(dataset, missing_type, model, missing_rates, y):
             y_train, y_test = y[trn_index], y[test_index]
             
             # Run the model and get the evaluation results
-            results = run_model(model, X_train, X_test, y_train, y_test)
+            results = run_model(model, X_train, X_test, y_train, y_test, data_stats)
             results_list.append(results)
         
         # Aggregate results for this missing rate
@@ -54,7 +76,11 @@ def run(dataset, missing_type, model, missing_rates, y):
 
     return all_results
 
-def run_model(model, X_train, X_test, y_train, y_test):
+
+
+
+
+def run_model(model, X_train, X_test, y_train, y_test,data_stats):
     if model == "mean":
         imputer = SimpleImputer(strategy='mean')
         X_train = imputer.fit_transform(X_train)
@@ -74,6 +100,7 @@ def run_model(model, X_train, X_test, y_train, y_test):
         results = run_rbfn(X_train, X_test, y_train, y_test)
 
     elif model == "ppca":
+        print("PPCA + MICE")
         # PPCA + MICE
         imputer = IterativeImputer()
         X_train = imputer.fit_transform(X_train)
@@ -82,6 +109,7 @@ def run_model(model, X_train, X_test, y_train, y_test):
         results = SVC_evaluation(train, y_train, test, y_test)
 
     elif model == "kpca":
+        print("KPCA + MICE")
         #KPCA + MICE
         imputer = IterativeImputer()
         X_train = imputer.fit_transform(X_train)
@@ -90,6 +118,8 @@ def run_model(model, X_train, X_test, y_train, y_test):
         results = SVC_evaluation(train, y_train, test, y_test)
 
     elif model == "ik":
+        print("IK + MICE")
+        # IK + MICE
         imputer = IterativeImputer()
         X_train = imputer.fit_transform(X_train)
         X_test = imputer.transform(X_test)
@@ -102,8 +132,18 @@ def run_model(model, X_train, X_test, y_train, y_test):
         results = SVC_evaluation(train_sim, y_train, test_sim, y_test, kernel="precomputed")
 
 
-    elif model == "mass":
-        result = run_mass(X_train, X_test, y_train, y_test)
+    elif model == "mpk":
+        print("MPK + MICE")
+        # MPK + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train,test  = run_mpk(X_train, X_test, data_stats)
+        results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
+
+    elif model == "impk":
+        print("iMPK + MICE")
+        results  = run_impk(X_train, X_test, data_stats)
 
     return results
 
