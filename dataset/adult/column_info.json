@@ -10,28 +10,28 @@
             "Self-emp-inc": 6,
             "Federal-gov": 7,
             "Without-pay": 8,
-            "Never-worked": 9
+            "Never-worked": 0
         }
     },
     "2": "numerical",
     "3": {
         "ordinal": {
-            "Preschool": 1,
-            "1st-4th": 2,
-            "5th-6th": 3,
-            "7th-8th": 4,
-            "9th": 5,
-            "10th": 6,
-            "11th": 7,
-            "12th": 8,
-            "HS-grad": 9,
-            "Some-college": 10,
-            "Assoc-voc": 11,
-            "Assoc-acdm": 12,
-            "Bachelors": 13,
-            "Masters": 14,
-            "Prof-school": 15,
-            "Doctorate": 16
+            "Preschool": 0,
+            "1st-4th": 1,
+            "5th-6th": 2,
+            "7th-8th": 3,
+            "9th": 4,
+            "10th": 5,
+            "11th": 6,
+            "12th": 7,
+            "HS-grad": 8,
+            "Some-college": 9,
+            "Assoc-voc": 10,
+            "Assoc-acdm": 11,
+            "Bachelors": 12,
+            "Masters": 13,
+            "Prof-school": 14,
+            "Doctorate": 15
         }
     },
     "4": "numerical",
@@ -43,7 +43,7 @@
             "Separated": 4,
             "Widowed": 5,
             "Married-spouse-absent": 6,
-            "Married-AF-spouse": 7
+            "Married-AF-spouse": 0
         }
     },
     "6": {
@@ -62,7 +62,7 @@
             "Tech-support": 12,
             "Protective-serv": 13,
             "Priv-house-serv": 14,
-            "Armed-Forces": 15
+            "Armed-Forces": 0
         }
     },
     "7": {
@@ -72,7 +72,7 @@
             "Own-child": 3,
             "Unmarried": 4,
             "Wife": 5,
-            "Other-relative": 6
+            "Other-relative": 0
         }
     },
     "8": {
@@ -81,7 +81,7 @@
             "Black": 2,
             "Asian-Pac-Islander": 3,
             "Amer-Indian-Eskimo": 4,
-            "Other": 5
+            "Other": 0
         }
     },
     "9": {
@@ -136,7 +136,7 @@
             "Scotland": 39,
             "Honduras": 40,
             "Hungary": 41,
-            "Holand-Netherlands": 42
+            "Holand-Netherlands": 0
         }
     }
 }

@@ -2,10 +2,9 @@
 
 REM Define the datasets
 set datasets=("car" "breast" "australian" "heart" "student" "banknote" "sonar" "spam" "wine")
-
+set datasets=("adult")
 REM Define the models
-set models=("mice" "mean" "genrbf" "rbfn" "ppca")
-set models=("ik" "kpca")
+set models=("mice" "mean" "genrbf" "rbfn" "ppca" "ik" "kpca")
 REM Define the missing types
 set missing_types=("mcar" "mar" "mnar")
 

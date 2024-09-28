@@ -10,16 +10,14 @@ from sklearn.impute import IterativeImputer
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
-# from genrbf.run_genrbf import run_genrbf
-# from rbfn_model import run_rbfn
+from genrbf.run_genrbf import run_genrbf
+from rbfn_model import run_rbfn
 from tqdm import tqdm
-#from ik import Isolation_Kernal,run_ppca,run_kpca
+from ik import Isolation_Kernal,run_ppca,run_kpca
 from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
 # from mass import Modify_Kernel as MKernel
-# import numpy as np
-# from rbfn_model import rbfn
 
 
 
@@ -53,6 +51,8 @@ def run(dataset, missing_type, model, missing_rates, y):
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             column_info = json.load(file)
             data_stats = stats_convert(column_info)
+    else:
+        data_stats = None
 
     all_results = {}
 
@@ -132,17 +132,17 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         results = SVC_evaluation(train_sim, y_train, test_sim, y_test, kernel="precomputed")
 
 
-    elif model == "mpk":
-        print("MPK + MICE")
-        # MPK + MICE/MODE
-        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
-        train, test  = run_mpk(X_train, X_test, data_stats)
+    # elif model == "mpk":
+    #     print("MPK + MICE")
+    #     # MPK + MICE/MODE
+    #     X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+    #     train, test  = run_mpk(X_train, X_test, data_stats)
         
-        results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
+    #     results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
-    elif model == "impk":
-        print("iMPK + MICE")
-        results  = run_impk(X_train, X_test, data_stats)
+    # elif model == "impk":
+    #     print("iMPK + MICE")
+    #     results  = run_impk(X_train, X_test, data_stats)
 
     return results
 
