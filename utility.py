@@ -134,11 +134,10 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
 
     elif model == "mpk":
         print("MPK + MICE")
-        # MPK + MICE
-        imputer = IterativeImputer()
-        X_train = imputer.fit_transform(X_train)
-        X_test = imputer.transform(X_test)
-        train,test  = run_mpk(X_train, X_test, data_stats)
+        # MPK + MICE/MODE
+        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+        train, test  = run_mpk(X_train, X_test, data_stats)
+        
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
     elif model == "impk":
@@ -189,6 +188,30 @@ def aggregate_results(results_list):
         "avg_f1_score": avg_f1_score,
         "std_f1_score": std_f1_score
     }
+
+
+def mice_mode_imputer(X_train, X_test, data_stats):
+
+    # Define imputers
+    numerical_imputer = IterativeImputer()          # For numerical columns
+    categorical_imputer = SimpleImputer(strategy='most_frequent')  # For categorical columns
+
+    # Iterate over each column based on data_stats
+    for i, attr in enumerate(data_stats['attribute']):
+        col_type = attr['type']
+        
+        # Check the type of the column and apply the appropriate imputer
+        if col_type == 'Numeric':
+            X_train[:, i:i+1] = numerical_imputer.fit_transform(X_train[:, i:i+1])
+            X_test[:, i:i+1] = numerical_imputer.transform(X_test[:, i:i+1])
+        else:
+            # Impute categorical columns using SimpleImputer with 'most_frequent' strategy
+            X_train[:, i:i+1] = categorical_imputer.fit_transform(X_train[:, i:i+1])
+            X_test[:, i:i+1] = categorical_imputer.transform(X_test[:, i:i+1])
+
+    return X_train, X_test
+
+
 
 
 # def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):

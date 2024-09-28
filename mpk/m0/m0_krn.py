@@ -23,6 +23,7 @@ class M0_Kernel:
 
         def get_bin_dissimilarity():
             bin_dissim = [[] for i in range(self.ndim_)]
+            
             max_num_bins = max(self.num_bins_)
 
             for i in range(self.ndim_):
@@ -39,6 +40,8 @@ class M0_Kernel:
                         bin_cf[j] = cf
 
                 b_mass = [[0.0 for j in range(max_num_bins)] for k in range(max_num_bins)]
+                
+
 
                 for j in range(n_bins):
                     for k in range(j, n_bins):
@@ -49,12 +52,10 @@ class M0_Kernel:
                                 prob_mass = (bin_cf[k] + bin_cf[j] + 1) / (self.ndata_ + n_bins)
                         else:
                             prob_mass = (bin_cf[k] - bin_cf[j] + self.bin_counts_[i][j] + 1) / (self.ndata_ + n_bins)
-
                         b_mass[j][k] = np.log(prob_mass)
                         b_mass[k][j] = b_mass[j][k]
 
                 bin_dissim[i] = b_mass
-
             return np.array(bin_dissim)
 
         self.ndata_ = len(train)
@@ -80,12 +81,13 @@ class M0_Kernel:
         self.nbins_ = nbins
 
     def transform(self, train, test=None):
+
         def dissimilarity(x_bin_ids, y_bin_ids):
             len_x, len_y = len(x_bin_ids), len(y_bin_ids)
-
             # check the vector size
             if (len_x != self.ndim_) or (len_y != self.ndim_):
                 raise IndexError("Number of columns does not match.")
+
             m_dissim = self.bin_dissimilarities_[self.dimVec_, x_bin_ids.astype(int), y_bin_ids.astype(int)]
             return np.sum(m_dissim) / self.ndim_
 
@@ -131,6 +133,7 @@ class M0_Kernel:
                 x_x = [0.0 for i in range(len(train))]
 
                 for i in range(len(train)):
+                    #print(train[i])
                     x_x[i] = dissimilarity(train[i], train[i])
 
                 for i in range(len(train)):

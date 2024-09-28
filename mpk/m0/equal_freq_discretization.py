@@ -3,6 +3,22 @@ from ctypes import c_float
 import numpy as np
 from bisect import bisect_left
 
+def transform_arrays(first_array, second_array):
+    # Find the maximum index needed
+    max_index = int(max(first_array)) + 1
+    
+    # Create the new first array starting from 0 up to the max index
+    new_first_array = list(range(max_index))
+    
+    # Create the new second array filled with zeros of length max_index
+    new_second_array = [0] * max_index
+    
+    # Populate the second array with values from the input arrays
+    for idx, value in zip(first_array, second_array):
+        new_second_array[int(idx)] = value
+    
+    return new_first_array, new_second_array
+
 
 class EqualFrequencyDiscretizer(object):
 
@@ -19,17 +35,34 @@ class EqualFrequencyDiscretizer(object):
       if (self.stats is None) or ("Numeric" in self.stats["attribute"][i]["type"]):
         b_cuts, b_counts = self.equal_freq_histograms(data[:, i], nbins)
         # b_cuts, b_counts = self.equal_freq_histograms_weka(data[:,i], nbins)
+        self.bin_cuts[i] = b_cuts
+        self.bin_counts[i] = b_counts
+        self.num_bins[i] = len(b_counts)
+      elif self.stats["attribute"][i]["type"] == "Ordinal" :
+        b_cuts, b_counts = self.equal_freq_histograms_ordinal(data[:, i], i)
+        self.bin_cuts[i] = b_cuts
+        self.bin_counts[i] = b_counts
+        self.num_bins[i] = int(max(data[:, i])+1)
       else:
         b_cuts, b_counts = self.equal_freq_histograms_non_numeric(data[:, i], i)
+        self.bin_cuts[i] = b_cuts
+        self.bin_counts[i] = b_counts
+        self.num_bins[i] = len(b_counts)
 
-      self.bin_cuts[i] = b_cuts
-      self.bin_counts[i] = b_counts
-      self.num_bins[i] = len(b_counts)
+      # print(self.bin_cuts[i],
+      #   self.bin_counts[i],
+      #   self.num_bins[i])
+
+
       for j in range(self.n_data):
         if (self.stats is None) or ("Numeric" in self.stats["attribute"][i]["type"]):
           self.data_bin_ids[j,i] = bisect_left(b_cuts[1:-1], data[j,i])
         else:
           self.data_bin_ids[j,i] = int(data[j,i])
+
+          # if i == 4:
+          #   print(data[j,i])
+
 
   def get_bin_cuts_counts(self):
     return self.bin_cuts, self.bin_counts
@@ -50,6 +83,32 @@ class EqualFrequencyDiscretizer(object):
         x_bin_ids[i] = int(x[i])
 
     return np.array(x_bin_ids)
+  
+
+  
+  def equal_freq_histograms_ordinal(self, x, idx):
+    # get unique values and counts
+    unique_values, unique_value_counts = np.unique(x, return_counts = True)
+    unique_values, unique_value_counts = transform_arrays(unique_values, unique_value_counts)
+
+    # if (self.stats is not None) and ("Numeric" not in self.stats["attribute"][idx]["type"]):
+    #   chk_cnt = []
+    #   idx_chk = 0
+
+    #   for i in range(len(self.stats["attribute"][idx]["values"])):
+    #     if (idx_chk < len(unique_values)) and (unique_values[idx_chk] == i):
+    #       chk_cnt.append(unique_value_counts[idx_chk])
+    #       idx_chk += 1
+    #     else:
+    #       chk_cnt.append(0)
+
+    #   unique_value_counts = chk_cnt
+
+    # return the result
+    return np.array([]), np.array(unique_value_counts)
+  
+
+  
 
   def equal_freq_histograms_non_numeric(self, x, idx):
     # get unique values and counts

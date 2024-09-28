@@ -35,6 +35,9 @@ datasets=("car" "breast" "australian" "heart" "adult"
 datasets=("car" "breast" "australian" "heart" 
           "student" "banknote" "sonar" "spam" "wine")
 
+
+datasets=("breast")
+
 # List of models
 models=("mice" "mean" "genrbf")
 models=("rbfn")
