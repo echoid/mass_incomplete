@@ -27,7 +27,6 @@ def run_impk(train_X, test_X, data_stats):
     train, test = impk_krn.build_model(train_X, test_X)  # this does the pre-processing step
     print("- Sim: Train")
     sim_train = impk_krn.transform(train)
-    exit()
     print("- Sim: Train/Test")
     sim_test = impk_krn.transform(train,test)
 

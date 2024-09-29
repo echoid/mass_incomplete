@@ -146,14 +146,14 @@ class IMPK_Kernel:
                         x_x[i] = dissimilarity(temp_train_i, temp_train_j)
 
                 with pymp.Parallel() as p1:
-                    with pymp.Parallel() as p2:
+#                    with pymp.Parallel() as p2:
                         for i in p1.range(len(train)):
-                            for j in p2.range(i, len(train)):
+                            for j in range(i, len(train)):
                                 temp_train_i, temp_train_j = convert(train,i, train,j)
                                 x_y = dissimilarity(temp_train_i, temp_train_j)
                                 d[i][j] = (2.0 * x_y) / (x_x[i] + x_x[j])
                                 d[j][i] = d[i][j]
-                                
+                        
             else: # test similarity similarity
                 d = pymp.shared.array((len(train), len(test)))
                 y_y = pymp.shared.array(len(test))
@@ -177,7 +177,7 @@ class IMPK_Kernel:
 
                             # Update the shared dissimilarity matrix
                             d[i][j] = (2.0 * x_y) / (x_x + y_y[j])
-
+                
         else:
             if test is None:
                 d = np.empty((len(train), len(train)))
