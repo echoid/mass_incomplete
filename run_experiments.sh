@@ -36,11 +36,9 @@ datasets=("car" "breast" "australian" "heart"
           "student" "banknote" "sonar" "spam" "wine")
 
 
-datasets=("breast")
+datasets=("adult")
 
 # List of models
-models=("mice" "mean" "genrbf")
-models=("rbfn")
 models=("mpk")
 
 # List of missing types
