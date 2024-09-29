@@ -14,21 +14,21 @@ def run_mpk(train_X, test_X, data_stats):
 
     print("- Sim: Train")
     sim_train = m0_krn.transform(train)
-    print(sim_train)
     print("- Sim: Train/Test")
     sim_test = m0_krn.transform(train,test)
-    
-    # try:
-    #     print("- Sim: Train")
-    #     sim_train = m0_krn.transform(train)
-    #     print(sim_train)
-    #     print("- Sim: Train/Test")
-    #     sim_test = m0_krn.transform(train,test)
-
-    # except:
-    #     return np.nan, np.nan
     return sim_train, sim_test.T
 
 
 def run_impk(train_X, test_X, data_stats):
-    pass
+
+    param_value = None  # use default: log2(num of inst) + 1
+    impk_krn = IMPK_Kernel(param_value, data_stats)
+    impk_krn.set_nbins(param_value)
+    train, test = impk_krn.build_model(train_X, test_X)  # this does the pre-processing step
+    print("- Sim: Train")
+    sim_train = impk_krn.transform(train)
+    exit()
+    print("- Sim: Train/Test")
+    sim_test = impk_krn.transform(train,test)
+
+    return sim_train, sim_test.T

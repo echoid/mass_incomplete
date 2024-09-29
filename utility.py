@@ -70,7 +70,6 @@ def run(dataset, missing_type, model, missing_rates, y):
             # Run the model and get the evaluation results
             results = run_model(model, X_train, X_test, y_train, y_test, data_stats)
             results_list.append(results)
-        
         # Aggregate results for this missing rate
         all_results[rate] = aggregate_results(results_list)
 
@@ -135,6 +134,7 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
     elif model == "mpk":
         print("MPK + MICE")
         # MPK + MICE/MODE
+        #X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
         X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
 
         train, test  = run_mpk(X_train, X_test, data_stats)
@@ -142,8 +142,10 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
     elif model == "impk":
-        print("iMPK + MICE")
-        results  = run_impk(X_train, X_test, data_stats)
+        print("iMPK")
+        train, test  = run_impk(X_train, X_test, data_stats)
+
+        results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
     return results
 
@@ -190,7 +192,19 @@ def aggregate_results(results_list):
         "std_f1_score": std_f1_score
     }
 
+def sampling(X_train, X_test, y_train, y_test, sample_size=0.1, random_state=42):
 
+    # Perform sampling on X_train and y_train
+    X_train_sample, _, y_train_sample, _ = train_test_split(
+        X_train, y_train, test_size=1 - sample_size, random_state=random_state
+    )
+
+    # Perform sampling on X_test and y_test
+    X_test_sample, _, y_test_sample, _ = train_test_split(
+        X_test, y_test, test_size=1 - sample_size, random_state=random_state
+    )
+
+    return X_train_sample, X_test_sample, y_train_sample, y_test_sample
 def mice_mode_imputer(X_train, X_test, data_stats):
 
     # Define imputers

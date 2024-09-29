@@ -36,10 +36,10 @@ datasets=("car" "breast" "australian" "heart"
           "student" "banknote" "sonar" "spam" "wine")
 
 
-datasets=("adult")
+#datasets=("adult")
 
 # List of models
-models=("mpk")
+models=("impk")
 
 # List of missing types
 missing_types=("mcar" "mar" "mnar")
