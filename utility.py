@@ -10,6 +10,7 @@ from sklearn.impute import IterativeImputer
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
+from sklearn.decomposition import KernelPCA
 #from genrbf.run_genrbf import run_genrbf
 #from rbfn_model import run_rbfn
 from tqdm import tqdm
@@ -143,13 +144,42 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
 
     elif model == "impk":
         print("iMPK")
+        X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
         train, test  = run_impk(X_train, X_test, data_stats)
 
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
+
+    elif model == "mpk_KPCA":
+        print("MPK + MICE + KPCA")
+        # MPK + MICE/MODE
+        #X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
+        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+        train, test  = run_mpk(X_train, X_test, data_stats)
+        try:
+            train, test  = KernelPCA_with_precomputed(train,test)
+            results = SVC_evaluation(train, y_train, test, y_test, kernel="linear")
+        except:
+            results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
+
+    elif model == "impk_KPCA":
+        print("iMPK + KPCA")
+        #X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
+        train, test  = run_impk(X_train, X_test, data_stats)
+        try:
+            train, test  = KernelPCA_with_precomputed(train,test)
+            results = SVC_evaluation(train, y_train, test, y_test, kernel="linear")
+        except:
+            results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
     return results
 
-
+def KernelPCA_with_precomputed(train,test):
+    # Perform KernelPCA using the precomputed kernel matrix
+    kpca = KernelPCA(kernel='precomputed')
+    train = kpca.fit_transform(train)
+    test = kpca.transform(test)
+    
+    return train, test
 
 def SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf"):
 
@@ -212,17 +242,22 @@ def mice_mode_imputer(X_train, X_test, data_stats):
     categorical_imputer = SimpleImputer(strategy='most_frequent')  # For categorical columns
 
     # Iterate over each column based on data_stats
-    for i, attr in enumerate(data_stats['attribute']):
-        col_type = attr['type']
-        
-        # Check the type of the column and apply the appropriate imputer
-        if col_type == 'Numeric':
-            X_train[:, i:i+1] = numerical_imputer.fit_transform(X_train[:, i:i+1])
-            X_test[:, i:i+1] = numerical_imputer.transform(X_test[:, i:i+1])
-        else:
-            # Impute categorical columns using SimpleImputer with 'most_frequent' strategy
-            X_train[:, i:i+1] = categorical_imputer.fit_transform(X_train[:, i:i+1])
-            X_test[:, i:i+1] = categorical_imputer.transform(X_test[:, i:i+1])
+    if data_stats:
+        for i, attr in enumerate(data_stats['attribute']):
+            col_type = attr['type']
+            
+            # Check the type of the column and apply the appropriate imputer
+            if col_type == 'Numeric':
+                X_train[:, i:i+1] = numerical_imputer.fit_transform(X_train[:, i:i+1])
+                X_test[:, i:i+1] = numerical_imputer.transform(X_test[:, i:i+1])
+            else:
+                # Impute categorical columns using SimpleImputer with 'most_frequent' strategy
+                X_train[:, i:i+1] = categorical_imputer.fit_transform(X_train[:, i:i+1])
+                X_test[:, i:i+1] = categorical_imputer.transform(X_test[:, i:i+1])
+    else:
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
 
     return X_train, X_test
 
