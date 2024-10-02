@@ -133,7 +133,6 @@ class M0_Kernel:
                 x_x = [0.0 for i in range(len(train))]
 
                 for i in range(len(train)):
-                    #print(train[i])
                     x_x[i] = dissimilarity(train[i], train[i])
 
                 for i in range(len(train)):

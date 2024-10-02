@@ -8,11 +8,7 @@
             ]
         },
         {
-            "type": "Nominal",
-            "values": [
-                1,
-                9
-            ]
+            "type": "Numeric"
         },
         {
             "type": "Numeric"

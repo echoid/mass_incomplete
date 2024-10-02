@@ -12,10 +12,10 @@ from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from sklearn.decomposition import KernelPCA
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
-from genrbf.run_genrbf import run_genrbf
-from rbfn_model import run_rbfn
+# from genrbf.run_genrbf import run_genrbf
+# from rbfn_model import run_rbfn
 from tqdm import tqdm
-from ik import Isolation_Kernal,run_ppca,run_kpca
+# from ik import Isolation_Kernal,run_ppca,run_kpca
 from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
@@ -49,10 +49,13 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
     if missing_rates is None: 
         missing_rates = [0.1]
 
-    if model in ["mpk","impk"]:
+    if model in ["mpk","impk"] and not clustering:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             column_info = json.load(file)
             data_stats = stats_convert(column_info)
+    elif model in ["mpk","impk"] and clustering:
+        with open(f"dataset/{dataset}/column_info.json", 'r') as file:
+            data_stats = json.load(file)
     else:
         data_stats = None
 
@@ -383,7 +386,7 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
 
     elif model == "impk":
         print("iMPK")
-        X_train, X_test = sampling(X_train, X_test, y_train, y_test)
+        #X_train, X_test = sampling(X_train, X_test, y_train, y_test)
         train, test = run_impk(X_train, X_test, data_stats)
         results = clustering_evaluation(train, y_train, test, y_test)
 

@@ -32,15 +32,25 @@ missing_types=("mcar" "mar" "mnar")
 datasets=("car" "breast" "australian" "heart" "adult" 
           "student" "banknote" "sonar" "spam" "wine")
 
-datasets=("car" "breast" "australian" "heart" 
-          "student" "banknote" "sonar" "spam" "wine" "adult")
+datasets=("hepatitis" "horse" "kidney" "mammo" "pima" "winconsin")
 
 
 # List of models
-models=("impk_KPCA" "mpk_KPCA")
+models=("impk" "mpk")
 
 # List of missing types
-missing_types=("mcar" "mar" "mnar")
+missing_types=("mcar")
+
+
+# for dataset in "${datasets[@]}"; do
+#   for model in "${models[@]}"; do
+#     for missing_type in "${missing_types[@]}"; do
+#       python main.py --datasets $dataset --models $model --missing_types $missing_type --save
+#     done
+#   done
+# done
+
+#echo "All experiments have been executed."
 
 
 for dataset in "${datasets[@]}"; do
@@ -50,5 +60,3 @@ for dataset in "${datasets[@]}"; do
     done
   done
 done
-
-#echo "All experiments have been executed."
