@@ -47,7 +47,7 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
     na_path = f"dataset_nan/{dataset}/{missing_type}/"
 
     if missing_rates is None: 
-        missing_rates = [0.1]
+        missing_rates = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 
     if model in ["mpk","impk" ] and not clustering:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
@@ -109,6 +109,7 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         imputer = SimpleImputer(strategy='mean')
         X_train = imputer.fit_transform(X_train)
         X_test = imputer.transform(X_test)
+        print(X_train.sum())
         results = SVC_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "mice":
@@ -141,19 +142,13 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         train,test = run_kpca(X_train,X_test)
         results = SVC_evaluation(train, y_train, test, y_test)
 
-    elif model == "ik":
-        print("IK + MICE")
+    elif model == "em":
         # IK + MICE
-        imputer = IterativeImputer()
-        X_train = imputer.fit_transform(X_train)
-        X_test = imputer.transform(X_test)
-        IK = Isolation_Kernal(psi=128, t=200, KD_tree=True)
-        IK.build(X_train)
-        train_feature = IK.generate_feature(X_train)
-        test_feature = IK.generate_feature(X_test)
-        test_sim = IK.similarity(test_feature,train_feature)
-        train_sim = IK.similarity(train_feature,train_feature)
-        results = SVC_evaluation(train_sim, y_train, test_sim, y_test, kernel="precomputed")
+        import impyute as impy
+
+        X_train = impy.em(X_train, loops=1000)
+        X_test = impy.em(X_test, loops=1000)
+        results = SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf")
 
 
     elif model == "mpk":
@@ -348,7 +343,7 @@ def simple_distance(X_train, X_test, data_stats):
 
     return train_dist, test_dist
 
-import gower
+#import gower
 
 def gowers_distance(X_train, X_test):
     # Gower's distance implementation from gower package

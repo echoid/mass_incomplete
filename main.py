@@ -21,7 +21,7 @@ def main():
     # Add argument for models with a set of options and a default
     parser.add_argument('--models', nargs='+', choices=['mass', 'mean','mice', 
                                                         'genrbf','rbfn',
-                                                        "ik","kpca","ppca",
+                                                        "em","kpca","ppca",
                                                         "mpk","impk",
                                                         "mpk_KPCA","impk_KPCA",
                                                         "simple","gower"],

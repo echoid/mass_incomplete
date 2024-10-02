@@ -34,14 +34,22 @@ datasets=("car" "breast" "australian" "heart" "adult"
 
 datasets=("hepatitis" "horse" "kidney" "mammo" "pima" "winconsin")
 
+datasets=("car" "breast" "heart" "sonar")
+
+datasets=("car" "breast" "australian" "heart"  
+          "student" "banknote" "sonar" "spam" "wine")
 
 # List of models
-models=("impk" "mpk")
-models=("mpk_0")
+models=("em")
+
 
 # List of missing types
-missing_types=("mcar")
+missing_types=("mcar" "mnar" "mar")
 
+
+# Car: genrbf, 
+# Breast, genrbf, ik, ppca_0
+# Heart, genrbf, ik , ppca_0
 
 # for dataset in "${datasets[@]}"; do
 #   for model in "${models[@]}"; do
