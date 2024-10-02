@@ -174,10 +174,13 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
 
-    elif model == "mpk_KPCA":
-        print("MPK + MICE + KPCA")
-        # MPK + MICE/MODE
-        #X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
+    elif model == "mpk_0":
+        print("MPK + 0")
+        zero_imputer = SimpleImputer(strategy='constant', fill_value=0)
+
+        # Apply the imputer to the training and test sets
+        X_train = zero_imputer.fit_transform(X_train)
+        X_test = zero_imputer.transform(X_test)
         X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
         train, test  = run_mpk(X_train, X_test, data_stats)
         try:
@@ -390,10 +393,13 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
         train, test = run_impk(X_train, X_test, data_stats)
         results = clustering_evaluation(train, y_train, test, y_test)
 
-    elif model == "mpk_KPCA":
-        print("MPK + MICE + KPCA")
-        # MPK + MICE/MODE + KPCA
-        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+    elif model == "mpk_0":
+        print("MPK + 0")
+        zero_imputer = SimpleImputer(strategy='constant', fill_value=0)
+
+        # Apply the imputer to the training and test sets
+        X_train = zero_imputer.fit_transform(X_train)
+        X_test = zero_imputer.transform(X_test)
         train, test = run_mpk(X_train, X_test, data_stats)
         try:
             train, test = KernelPCA_with_precomputed(train, test)

@@ -37,6 +37,7 @@ datasets=("hepatitis" "horse" "kidney" "mammo" "pima" "winconsin")
 
 # List of models
 models=("impk" "mpk")
+models=("mpk_0")
 
 # List of missing types
 missing_types=("mcar")
