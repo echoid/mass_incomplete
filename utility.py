@@ -49,11 +49,11 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
     if missing_rates is None: 
         missing_rates = [0.1]
 
-    if model in ["mpk","impk"] and not clustering:
+    if model in ["mpk","impk" ] and not clustering:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             column_info = json.load(file)
             data_stats = stats_convert(column_info)
-    elif model in ["mpk","impk"] and clustering:
+    elif model in ["mpk","impk","simple","gower"] and clustering:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             data_stats = json.load(file)
     else:
@@ -174,13 +174,10 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
 
 
-    elif model == "mpk_0":
-        print("MPK + 0")
-        zero_imputer = SimpleImputer(strategy='constant', fill_value=0)
-
-        # Apply the imputer to the training and test sets
-        X_train = zero_imputer.fit_transform(X_train)
-        X_test = zero_imputer.transform(X_test)
+    elif model == "mpk_KPCA":
+        print("MPK + MICE + KPCA")
+        # MPK + MICE/MODE
+        #X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
         X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
         train, test  = run_mpk(X_train, X_test, data_stats)
         try:
@@ -326,6 +323,40 @@ def mice_mode_imputer(X_train, X_test, data_stats):
 
     return X_train, X_test
 
+from sklearn.metrics import pairwise_distances
+
+from sklearn.metrics import pairwise_distances
+import numpy as np
+
+def simple_distance(X_train, X_test, data_stats):
+    # Create masks for numerical and categorical (nominal) features
+    num_mask = np.array([attr['type'] == 'Numeric' for attr in data_stats['attribute']])
+    cat_mask = np.array([attr['type'] == 'Nominal' for attr in data_stats['attribute']])
+    
+    def mixed_distance(a, b):
+        # Euclidean distance for numerical features
+        euclidean_dist = np.linalg.norm(a[num_mask] - b[num_mask])
+
+        # Matching distance for categorical features (0 if same, 1 if different)
+        matching_dist = np.sum(a[cat_mask] != b[cat_mask])
+
+        return euclidean_dist + matching_dist
+
+    # Compute distance matrices for both train and test sets
+    train_dist = pairwise_distances(X_train, metric=mixed_distance)
+    test_dist = pairwise_distances(X_test, X_train, metric=mixed_distance)
+
+    return train_dist, test_dist
+
+import gower
+
+def gowers_distance(X_train, X_test):
+    # Gower's distance implementation from gower package
+    train_dist = gower.gower_matrix(X_train)
+    test_dist = gower.gower_matrix(X_test, X_train)
+    
+    return train_dist, test_dist
+
 
 from sklearn.cluster import KMeans, DBSCAN
 
@@ -341,6 +372,23 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
         X_train = imputer.fit_transform(X_train)
         X_test = imputer.transform(X_test)
         results = clustering_evaluation(X_train, y_train, X_test, y_test)
+
+    elif model == "simple":
+        print("MICE + simple")
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train, test = simple_distance(X_train, X_test, data_stats)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "gower":
+        print("MICE + GOWER")
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train, test = gowers_distance(X_train, X_test)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
 
     elif model == "genrbf":
         train, test = run_genrbf(X_train.astype(np.float64), X_test.astype(np.float64))
@@ -393,13 +441,10 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
         train, test = run_impk(X_train, X_test, data_stats)
         results = clustering_evaluation(train, y_train, test, y_test)
 
-    elif model == "mpk_0":
-        print("MPK + 0")
-        zero_imputer = SimpleImputer(strategy='constant', fill_value=0)
-
-        # Apply the imputer to the training and test sets
-        X_train = zero_imputer.fit_transform(X_train)
-        X_test = zero_imputer.transform(X_test)
+    elif model == "mpk_KPCA":
+        print("MPK + MICE + KPCA")
+        # MPK + MICE/MODE + KPCA
+        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
         train, test = run_mpk(X_train, X_test, data_stats)
         try:
             train, test = KernelPCA_with_precomputed(train, test)

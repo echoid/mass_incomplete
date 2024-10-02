@@ -22,8 +22,9 @@ def main():
     parser.add_argument('--models', nargs='+', choices=['mass', 'mean','mice', 
                                                         'genrbf','rbfn',
                                                         "ik","kpca","ppca",
-                                                        "mpk","impk","impk_KPCA",
-                                                        "mpk_0"],
+                                                        "mpk","impk",
+                                                        "mpk_KPCA","impk_KPCA",
+                                                        "simple","gower"],
                         default=['mean'],  # Set "mean" as the default model
                         help='List of models to run tests with')
 
