@@ -1,0 +1,9 @@
+,Metric,Value
+0,avg_kmeans_nmi,0.009853218595391988
+1,std_kmeans_nmi,0.005929517773479129
+2,avg_kmeans_ari,-0.004646709940693151
+3,std_kmeans_ari,0.03133926286681434
+4,avg_dbscan_nmi,0.0
+5,std_dbscan_nmi,0.0
+6,avg_dbscan_ari,0.0
+7,std_dbscan_ari,0.0

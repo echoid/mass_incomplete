@@ -1,0 +1,113 @@
+{
+    "attribute": [
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        }
+    ]
+}

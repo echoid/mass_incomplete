@@ -11,10 +11,11 @@ from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from sklearn.decomposition import KernelPCA
-#from genrbf.run_genrbf import run_genrbf
-#from rbfn_model import run_rbfn
+from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
+from genrbf.run_genrbf import run_genrbf
+from rbfn_model import run_rbfn
 from tqdm import tqdm
-#from ik import Isolation_Kernal,run_ppca,run_kpca
+from ik import Isolation_Kernal,run_ppca,run_kpca
 from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
@@ -41,12 +42,12 @@ def stats_convert(column_info):
 
     return stats
 
-def run(dataset, missing_type, model, missing_rates, y):
+def run(dataset, missing_type, model, missing_rates, y, clustering = False):
     
     na_path = f"dataset_nan/{dataset}/{missing_type}/"
 
     if missing_rates is None: 
-        missing_rates = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+        missing_rates = [0.1]
 
     if model in ["mpk","impk"]:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
@@ -57,9 +58,30 @@ def run(dataset, missing_type, model, missing_rates, y):
 
     all_results = {}
 
-    for rate in tqdm(missing_rates):
-        data_na = np.load(na_path + f"{rate}.npy")
-        
+    if not clustering:
+        for rate in tqdm(missing_rates):
+            data_na = np.load(na_path + f"{rate}.npy")
+            
+            skf = StratifiedKFold(n_splits=5)
+            results_list = []
+
+            for id_acc, (trn_index, test_index) in enumerate(skf.split(data_na, y)):
+                
+                X_train, X_test = data_na[trn_index], data_na[test_index]
+                y_train, y_test = y[trn_index], y[test_index]
+                
+                # Run the model and get the evaluation results
+                results = run_model(model, X_train, X_test, y_train, y_test, data_stats)
+                results_list.append(results)
+            # Aggregate results for this missing rate
+            all_results[rate] = aggregate_results(results_list)
+
+        return all_results
+    
+    else:
+        path = f"dataset/{dataset}/"
+        data_na = np.load(path + "feature.npy")
+
         skf = StratifiedKFold(n_splits=5)
         results_list = []
 
@@ -68,14 +90,13 @@ def run(dataset, missing_type, model, missing_rates, y):
             X_train, X_test = data_na[trn_index], data_na[test_index]
             y_train, y_test = y[trn_index], y[test_index]
             
-            # Run the model and get the evaluation results
-            results = run_model(model, X_train, X_test, y_train, y_test, data_stats)
+        #     # Run the model and get the evaluation results
+            results = run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats)
             results_list.append(results)
-        # Aggregate results for this missing rate
-        all_results[rate] = aggregate_results(results_list)
+        # # Aggregate results for this missing rate
+        result = aggregate_results(results_list,clustering)
 
-    return all_results
-
+        return result
 
 
 
@@ -173,6 +194,8 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
             results = SVC_evaluation(train, y_train, test, y_test, kernel="precomputed")
     return results
 
+
+
 def KernelPCA_with_precomputed(train,test):
     # Perform KernelPCA using the precomputed kernel matrix
     kpca = KernelPCA(kernel='precomputed')
@@ -209,18 +232,54 @@ def SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf"):
 
     return results
 
-def aggregate_results(results_list):
-    avg_accuracy = np.mean([result['accuracy'] for result in results_list])
-    avg_f1_score = np.mean([result['f1_score'] for result in results_list])
-    std_accuracy = np.std([result['accuracy'] for result in results_list])
-    std_f1_score = np.std([result['f1_score'] for result in results_list])
 
-    return {
-        "avg_accuracy": avg_accuracy,
-        "std_accuracy": std_accuracy,
-        "avg_f1_score": avg_f1_score,
-        "std_f1_score": std_f1_score
-    }
+
+
+
+
+
+def aggregate_results(results_list,clustering =False):
+    if not clustering:
+        avg_accuracy = np.mean([result['accuracy'] for result in results_list])
+        avg_f1_score = np.mean([result['f1_score'] for result in results_list])
+        std_accuracy = np.std([result['accuracy'] for result in results_list])
+        std_f1_score = np.std([result['f1_score'] for result in results_list])
+
+        return {
+            "avg_accuracy": avg_accuracy,
+            "std_accuracy": std_accuracy,
+            "avg_f1_score": avg_f1_score,
+            "std_f1_score": std_f1_score
+        }
+    else:
+        #print("Calculating",results_list)
+
+        avg_kmeans_nmi = np.mean([result['KMeans_nmi'] for result in results_list])
+        std_kmeans_nmi = np.std([result['KMeans_nmi'] for result in results_list])
+        
+        avg_kmeans_ari = np.mean([result['KMeans_ari'] for result in results_list])
+        std_kmeans_ari = np.std([result['KMeans_ari'] for result in results_list])
+
+        # Compute the average and std of NMI and ARI for DBSCAN
+        avg_dbscan_nmi = np.mean([result['DBSCAN_nmi'] for result in results_list])
+        std_dbscan_nmi = np.std([result['DBSCAN_nmi'] for result in results_list])
+        
+        avg_dbscan_ari = np.mean([result['DBSCAN_ari'] for result in results_list])
+        std_dbscan_ari = np.std([result['DBSCAN_ari'] for result in results_list])
+
+        d = {
+            # K-Means results
+            "avg_kmeans_nmi": avg_kmeans_nmi,
+            "std_kmeans_nmi": std_kmeans_nmi,
+            "avg_kmeans_ari": avg_kmeans_ari,
+            "std_kmeans_ari": std_kmeans_ari,
+            # DBSCAN results
+            "avg_dbscan_nmi": avg_dbscan_nmi,
+            "std_dbscan_nmi": std_dbscan_nmi,
+            "avg_dbscan_ari": avg_dbscan_ari,
+            "std_dbscan_ari": std_dbscan_ari
+        }
+        return d
 
 def sampling(X_train, X_test, y_train, y_test, sample_size=0.1, random_state=42):
 
@@ -262,105 +321,121 @@ def mice_mode_imputer(X_train, X_test, data_stats):
     return X_train, X_test
 
 
+from sklearn.cluster import KMeans, DBSCAN
 
+def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
+    if model == "mean":
+        imputer = SimpleImputer(strategy='mean')
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        results = clustering_evaluation(X_train, y_train, X_test, y_test)
 
-# def run_test(data,missing_rate,mtype = "mcar",model = "mass",data_stats = None):
-#     X = data["X"]
-#     Y = data["Y"]
-#     train_X, test_X, train_Y, test_Y = train_test_split(X, Y, test_size=0.2, random_state=42)
+    elif model == "mice":
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        results = clustering_evaluation(X_train, y_train, X_test, y_test)
 
+    elif model == "genrbf":
+        train, test = run_genrbf(X_train.astype(np.float64), X_test.astype(np.float64))
 
-#     train_X = make_missing(train_X,rate = missing_rate,type = mtype)
-#     test_X = make_missing(test_X,rate = missing_rate,type = mtype)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "rbfn":
+        results = run_rbfn(X_train, X_test, y_train, y_test)  # Assuming `run_rbfn` is clustering-compatible
+
+    elif model == "ppca":
+        print("PPCA + MICE")
+        # PPCA + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train, test = run_ppca(X_train, X_test)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "kpca":
+        print("KPCA + MICE")
+        # KPCA + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        train, test = run_kpca(X_train, X_test)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "ik":
+        print("IK + MICE")
+        # IK + MICE
+        imputer = IterativeImputer()
+        X_train = imputer.fit_transform(X_train)
+        X_test = imputer.transform(X_test)
+        IK = Isolation_Kernal(psi=128, t=200, KD_tree=True)
+        IK.build(X_train)
+        train_feature = IK.generate_feature(X_train)
+        test_feature = IK.generate_feature(X_test)
+        results = clustering_evaluation(train_feature, y_train, test_feature, y_test)
+
+    elif model == "mpk":
+        print("MPK + MICE")
+        # MPK + MICE/MODE
+        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+        train, test = run_mpk(X_train, X_test, data_stats)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "impk":
+        print("iMPK")
+        X_train, X_test = sampling(X_train, X_test, y_train, y_test)
+        train, test = run_impk(X_train, X_test, data_stats)
+        results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "mpk_KPCA":
+        print("MPK + MICE + KPCA")
+        # MPK + MICE/MODE + KPCA
+        X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
+        train, test = run_mpk(X_train, X_test, data_stats)
+        try:
+            train, test = KernelPCA_with_precomputed(train, test)
+            results = clustering_evaluation(train, y_train, test, y_test)
+        except:
+            results = clustering_evaluation(train, y_train, test, y_test)
+
+    elif model == "impk_KPCA":
+        print("iMPK + KPCA")
+        # iMPK + KPCA
+        train, test = run_impk(X_train, X_test, data_stats)
+        try:
+            train, test = KernelPCA_with_precomputed(train, test)
+            results = clustering_evaluation(train, y_train, test, y_test)
+        except:
+            results = clustering_evaluation(train, y_train, test, y_test)
+
+    return results
+
+# Clustering evaluation function (you already have this from the previous code)
+def clustering_evaluation(X_train, y_train, X_test, y_test):
+    # KMeans evaluation
+    n_clusters = len(np.unique(y_train))
+    kmeans = KMeans(n_clusters=n_clusters)
+    kmeans.fit(X_train)
+    y_pred_kmeans = kmeans.predict(X_test)
     
-#     if model == "mass":
-#         kernal = MKernel(None, data_stats)
-#         kernal.set_nbins(param_value)
 
+    kmeans_nmi = normalized_mutual_info_score(y_test, y_pred_kmeans)
+    kmeans_ari = adjusted_rand_score(y_test, y_pred_kmeans)
 
-#         train_mod, test_mod = kernal.build_model(train_X, test_X)  # this does the pre-processing step
+    # DBSCAN evaluation
+    dbscan = DBSCAN(eps=0.5, min_samples=5)
+    dbscan.fit(X_test)
+    y_pred_dbscan = dbscan.labels_
 
-#         sim_train = kernal.transform(train_mod)
-#         sim_test = kernal.transform(test_mod,train_mod)  # row = train, col = test
+    dbscan_nmi = normalized_mutual_info_score(y_test, y_pred_dbscan)
+    dbscan_ari = adjusted_rand_score(y_test, y_pred_dbscan)
 
-#         # Configure Kernel PCA for precomputed kernels
-#         kpca = KernelPCA(kernel='precomputed')
-
-#         # Transform data using Kernel PCA
-#         X_kpca_train = kpca.fit_transform(sim_train)
-#         X_kpca_test = kpca.transform(sim_test)
-
-#     elif model == "mean":
-#         # Mean imputation
-#         imputer = SimpleImputer(strategy='mean')
-
-#         # Fit the imputer on the training data and transform both training and test data
-#         X_kpca_train = imputer.fit_transform(train_X)
-#         X_kpca_test = imputer.transform(test_X)
-
-
-#     elif model == "mice":
-#         # MICE imputation
-#         imputer = IterativeImputer()
-
-#         # Fit the imputer on the training data and transform both training and test data
-#         X_kpca_train = imputer.fit_transform(train_X)
-#         X_kpca_test = imputer.transform(test_X)
-#     elif model == "rbfn":
-
-#         y_pred = rbfn(train_X,test_X,train_Y,test_Y)
-
-#         # acc = accuracy_score(test_Y, y_pred)
-#         # f1 = f1_score(test_Y, y_pred, average='macro')
-
-#         exit()
-
-#     elif model == "genrbf":
-#         C = 1
-#         gamma = 1.e-3
-#         index_train = np.arange(train_X.shape[0])
-#         index_test = np.arange(test_X.shape[0])
-
-#         #X = np.concatenate((X_train, X_test), axis=0)
-#         #del X_train, X_test
-
-#         index_train = index_train.astype(np.intc)
-#         index_test = index_test.astype(np.intc)
-#         imputer = SimpleImputer(strategy='mean')
-#         train_X_imputed = imputer.fit_transform(train_X)
-
-
-#         m = np.mean(train_X_imputed, axis=0)
-#         cov = np.cov(train_X_imputed, rowvar=False)
-
-#         rbf_ker = rbf.RBFkernel(m, cov, train_X)
-
-
-#         S_train, S_test, completeDataId_train, completeDataId_test = fun.trainTestID_1(index_test, index_train,
-#                                                                                         rbf_ker.S)
-
-#         S_train_new, completeDataId_train_new = fun.updateSamples(index_train, S_train, completeDataId_train)
-
-        
-
-#         train = rbf_ker.kernelTrain(gamma, index_train, S_train_new, completeDataId_train_new)
-
-#         # test
-#         S_test_new, completeDataId_test_new = fun.updateSamples(index_test, S_test, completeDataId_test)
-#         test = rbf_ker.kernelTest(gamma, index_test, index_train, S_test_new, S_train_new,
-#                                 completeDataId_test_new, completeDataId_train_new)
-
-
-#         # Configure Kernel PCA for precomputed kernels
-#         precomputed_svm = SVC(C=C, kernel='precomputed')
-#         precomputed_svm.fit(train, train_Y)
-#         y_pred = precomputed_svm.predict(test)
-#         acc = accuracy_score(test_Y, y_pred)
-#         f1 = f1_score(test_Y, y_pred, average='macro')
-
-#     # Print mean F1 score and accuracy
-
-#         print(f"Mean CV F1 Score {model}: {np.mean(f1):.4f}")
-#         print(f"Mean CV Accuracy {model}: {np.mean(acc):.4f}")
-        
-#         return f1,acc
+    # Return results
+    results = {
+        "KMeans_nmi": kmeans_nmi,
+        "KMeans_ari": kmeans_ari,
+        "DBSCAN_nmi": dbscan_nmi,
+        "DBSCAN_ari": dbscan_ari
+    }
+    
+    return results

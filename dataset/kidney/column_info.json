@@ -1,0 +1,132 @@
+{
+    "attribute": [
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                0,
+                1
+            ]
+        }
+    ]
+}

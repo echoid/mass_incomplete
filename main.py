@@ -12,7 +12,9 @@ def main():
 
     # Add argument for datasets with a set of options and a default
     parser.add_argument('--datasets', nargs='+', choices=["car", "breast", "australian", "heart", "adult", 
-                                                          "student", "banknote", "sonar", "spam", "wine"],
+                                                          "student", "banknote", "sonar", "spam", "wine",
+                                                          "hepatitis","horse","kidney","mammo","pima","winconsin"
+                                                          ],
                         default=["banknote"],  # Set "banknote" as the default dataset
                         help='List of datasets to run tests on')
 
@@ -44,10 +46,17 @@ def main():
 
     datasets     = args.datasets
     models       = args.models
-    missing_types = args.missing_types
-    missing_rates = args.missing_rates
-    save = args.save
-
+    if datasets[0] in ["hepatitis","horse","kidney","mammo","pima","winconsin"]:
+        missing_types =  args.missing_types
+        missing_rates = None
+        clustering = True
+        save = args.save
+    else:
+        missing_types = args.missing_types
+        missing_rates = args.missing_rates
+        save = args.save
+        clustering = False
+    
     for dataset in datasets:
         # Load data for the current dataset
         path = f"dataset/{dataset}/"
@@ -57,9 +66,12 @@ def main():
         # Iterate through each model, missing type, and missing rate
         for missing_type in missing_types:
             for model in models:
-                all_results = run(dataset, missing_type, model, missing_rates, y)
-
-                result = pd.DataFrame(all_results)
+                all_results = run(dataset, missing_type, model, missing_rates, y, clustering)
+                
+                if clustering:
+                    result = pd.DataFrame(list(all_results.items()), columns=['Metric', 'Value'])
+                else:
+                    result = pd.DataFrame(all_results)
 
                 output_path = f"results/{missing_type}/{dataset}/"
                 os.makedirs(output_path, exist_ok=True)

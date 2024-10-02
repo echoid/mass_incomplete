@@ -1,0 +1,155 @@
+{
+    "attribute": [
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "Nominal",
+            "values": [
+                1,
+                9
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "type": "Numeric"
+        },
+        {
+            "type": "Ordinal",
+            "values": [
+                1,
+                2,
+                3
+            ]
+        }
+    ]
+}
