@@ -29,8 +29,8 @@ def main():
                         help='List of models to run tests with')
 
     # Add argument for missing types with a set of options and a default
-    parser.add_argument('--missing_types', nargs='+', choices=["mcar", "mar", "mnar"],
-                        default=["mcar"],  # Set "mcar" as the default missing type
+    parser.add_argument('--missing_types', nargs='+', choices=["mcar", "mar", "mnar","default","clustering"],
+                        default=["default"],  # Set "mcar" as the default missing type
                         help='List of missing data types to consider')
     
     # Add argument for missing rates with a set of options and a default
@@ -39,6 +39,7 @@ def main():
                         default=None,  
                         help='List of missing data rates to consider')
     
+    parser.add_argument('--cluster', action='store_true', help='Flag to save the results')
     # Add a boolean flag for saving the results
     parser.add_argument('--save', action='store_true', help='Flag to save the results')
 
@@ -47,16 +48,11 @@ def main():
 
     datasets     = args.datasets
     models       = args.models
-    if datasets[0] in ["hepatitis","horse","kidney","mammo","pima","winconsin"]:
-        missing_types =  args.missing_types
-        missing_rates = None
-        clustering = True
-        save = args.save
-    else:
-        missing_types = args.missing_types
-        missing_rates = args.missing_rates
-        save = args.save
-        clustering = False
+
+    missing_types = args.missing_types
+    missing_rates = args.missing_rates
+    save = args.save
+    clustering = args.cluster
     
     for dataset in datasets:
         # Load data for the current dataset

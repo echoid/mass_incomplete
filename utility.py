@@ -12,10 +12,10 @@ from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from sklearn.decomposition import KernelPCA
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
-# from genrbf.run_genrbf import run_genrbf
-# from rbfn_model import run_rbfn
+from genrbf.run_genrbf import run_genrbf
+from rbfn_model import run_rbfn
 from tqdm import tqdm
-# from ik import Isolation_Kernal,run_ppca,run_kpca
+from ik import Isolation_Kernal,run_ppca,run_kpca
 from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
@@ -63,8 +63,12 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
 
     if not clustering:
         for rate in tqdm(missing_rates):
-            data_na = np.load(na_path + f"{rate}.npy")
             
+            if dataset in ["hepatitis","horse","kidney","mammo","pima","winconsin"]:
+                        path = f"dataset/{dataset}/"
+                        data_na = np.load(path + "feature.npy")
+            else:
+                data_na = np.load(na_path + f"{rate}.npy")
             skf = StratifiedKFold(n_splits=5)
             results_list = []
 
@@ -88,10 +92,13 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
         skf = StratifiedKFold(n_splits=5)
         results_list = []
 
-        for id_acc, (trn_index, test_index) in enumerate(skf.split(data_na, y)):
+        for i in range(5):
             
-            X_train, X_test = data_na[trn_index], data_na[test_index]
-            y_train, y_test = y[trn_index], y[test_index]
+            # X_train, X_test = data_na[trn_index], data_na[test_index]
+            # y_train, y_test = y[trn_index], y[test_index]
+
+            X_train, X_test = data_na, data_na
+            y_train, y_test = y, y
             
         #     # Run the model and get the evaluation results
             results = run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats)
@@ -109,7 +116,6 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         imputer = SimpleImputer(strategy='mean')
         X_train = imputer.fit_transform(X_train)
         X_test = imputer.transform(X_test)
-        print(X_train.sum())
         results = SVC_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "mice":
@@ -143,9 +149,10 @@ def run_model(model, X_train, X_test, y_train, y_test,data_stats):
         results = SVC_evaluation(train, y_train, test, y_test)
 
     elif model == "em":
-        # IK + MICE
+        X_train = X_train.astype(float)
+        X_test = X_test.astype(float)
+        X_train, X_test, y_train, y_test = sampling(X_train, X_test, y_train, y_test)
         import impyute as impy
-
         X_train = impy.em(X_train, loops=1000)
         X_test = impy.em(X_test, loops=1000)
         results = SVC_evaluation(X_train, y_train, X_test, y_test, kernel="rbf")
@@ -360,6 +367,14 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
         imputer = SimpleImputer(strategy='mean')
         X_train = imputer.fit_transform(X_train)
         X_test = imputer.transform(X_test)
+        results = clustering_evaluation(X_train, y_train, X_test, y_test)
+    if model == "em":
+        X_train = X_train.astype(float)
+        X_test = X_test.astype(float)
+        import impyute as impy
+        X_train = impy.em(X_train, loops=1000)
+        X_test = impy.em(X_test, loops=1000)
+
         results = clustering_evaluation(X_train, y_train, X_test, y_test)
 
     elif model == "mice":
