@@ -5,7 +5,7 @@ datasets=("hepatitis" "horse" "kidney" "mammo" "pima" "winconsin")
 
 # List of models
 models=("mean" "mice" "em" "genrbf" "rbfnn" "kpca" "ppca" "mpk")
-models=("em")
+models=("impk")
 
 
 # List of missing types
