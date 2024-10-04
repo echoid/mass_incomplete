@@ -1,5 +1,9 @@
-,0.1
-avg_accuracy,0.8210526315789475
-std_accuracy,0.07139294719079232
-avg_f1_score,0.808170854200266
-std_f1_score,0.08651365776149833
+,Metric,Value
+0,avg_kmeans_nmi,0.3271307045623641
+1,std_kmeans_nmi,0.0
+2,avg_kmeans_ari,0.4196531925071576
+3,std_kmeans_ari,0.0
+4,avg_dbscan_nmi,0.13582939633237315
+5,std_dbscan_nmi,0.0
+6,avg_dbscan_ari,0.012816048502919156
+7,std_dbscan_ari,0.0

@@ -427,24 +427,14 @@ def run_clustering_model(model, X_train, X_test, y_train, y_test, data_stats):
         train, test = run_kpca(X_train, X_test)
         results = clustering_evaluation(train, y_train, test, y_test)
 
-    elif model == "ik":
-        print("IK + MICE")
-        # IK + MICE
-        imputer = IterativeImputer()
-        X_train = imputer.fit_transform(X_train)
-        X_test = imputer.transform(X_test)
-        IK = Isolation_Kernal(psi=128, t=200, KD_tree=True)
-        IK.build(X_train)
-        train_feature = IK.generate_feature(X_train)
-        test_feature = IK.generate_feature(X_test)
-        results = clustering_evaluation(train_feature, y_train, test_feature, y_test)
-
     elif model == "mpk":
         print("MPK + MICE")
         # MPK + MICE/MODE
         X_train, X_test = mice_mode_imputer(X_train, X_test, data_stats)
         train, test = run_mpk(X_train, X_test, data_stats)
+        print("run clustering evaluation")
         results = clustering_evaluation(train, y_train, test, y_test)
+        print(results)
 
     elif model == "impk":
         print("iMPK")

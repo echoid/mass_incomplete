@@ -70,8 +70,12 @@ def main():
                 else:
                     result = pd.DataFrame(all_results)
 
+                print(result)
+
                 output_path = f"results/{missing_type}/{dataset}/"
                 os.makedirs(output_path, exist_ok=True)
+
+                print(output_path)
 
                 if save:
                     result.to_csv(os.path.join(output_path, f"{model}.csv"))
