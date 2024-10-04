@@ -5,11 +5,10 @@ datasets=("hepatitis" "horse" "kidney" "mammo" "pima" "winconsin")
 
 # List of models
 models=("mean" "mice" "em" "genrbf" "rbfnn" "kpca" "ppca" "mpk")
-models=("impk")
+models=("impk" "mpk")
 
 
 # List of missing types
-missing_types=("default")
 missing_types=("clustering")
 
 

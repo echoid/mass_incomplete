@@ -17,7 +17,7 @@ for %%d in (%datasets%) do (
         REM Loop through missing types
         for %%t in (%missing_types%) do (
             REM Run the Python script with the current parameters
-            python main.py --datasets %%d --models %%m --missing_types %%t --save --missing_rates 0.1 
+            python main.py --datasets %%d --models %%m --missing_types %%t --save --missing_rates 0.1 --cluster
         )
     )
 )

@@ -43,6 +43,7 @@ def stats_convert(column_info):
     return stats
 
 def run(dataset, missing_type, model, missing_rates, y, clustering = False):
+    print("This is Clustering", clustering)
     
     na_path = f"dataset_nan/{dataset}/{missing_type}/"
 
