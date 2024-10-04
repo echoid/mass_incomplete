@@ -12,10 +12,10 @@ from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 from sklearn.decomposition import KernelPCA
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
-from genrbf.run_genrbf import run_genrbf
-from rbfn_model import run_rbfn
+# from genrbf.run_genrbf import run_genrbf
+# from rbfn_model import run_rbfn
 from tqdm import tqdm
-from ik import Isolation_Kernal,run_ppca,run_kpca
+# from ik import Isolation_Kernal,run_ppca,run_kpca
 from mass_model import run_mpk, run_impk
 # from sklearn.svm import SVC
 # from sklearn.decomposition import KernelPCA
@@ -49,11 +49,11 @@ def run(dataset, missing_type, model, missing_rates, y, clustering = False):
     if missing_rates is None: 
         missing_rates = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 
-    if model in ["mpk","impk" ] and not clustering:
+    if model in ["mpk","impk" ] and dataset not in ["hepatitis", "horse", "kidney", "mammo", "pima", "winconsin"]:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             column_info = json.load(file)
             data_stats = stats_convert(column_info)
-    elif model in ["mpk","impk","simple","gower"] and clustering:
+    elif model in ["mpk","impk","simple","gower"] and dataset in ["hepatitis", "horse", "kidney", "mammo", "pima", "winconsin"]:
         with open(f"dataset/{dataset}/column_info.json", 'r') as file:
             data_stats = json.load(file)
     else:
